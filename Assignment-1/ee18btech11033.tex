@@ -94,12 +94,12 @@ columns=fullflexible
 \theoremstyle{remark}
 \newtheorem{rem}{Remark}
 \newcommand{\sgn}{\mathop{\mathrm{sgn}}}
-\providecommand{\abs}[1]{\left\vert#1\right\vert}
+\providecommand{\abs}[1]{\left\vert#1\right\vert} 
 \providecommand{\res}[1]{\Res\displaylimits_{#1}} 
-\providecommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\norm}[1]{\left\lVert#1\right\rVert} 
 %\providecommand{\norm}[1]{\lVert#1\rVert}
 \providecommand{\mtx}[1]{\mathbf{#1}}
-\providecommand{\mean}[1]{E\left[ #1 \right]}
+\providecommand{\mean}[1]{E\left[ #1 \right]} 
 \providecommand{\fourier}{\overset{\mathcal{F}}{ \rightleftharpoons}}
 %\providecommand{\hilbert}{\overset{\mathcal{H}}{ \rightleftharpoons}}
 \providecommand{\system}{\overset{\mathcal{H}}{ \longleftrightarrow}}
@@ -151,13 +151,53 @@ in Problem 2.3 is executed through following difference equation
     \end{align}
  where input signal is $x(n)$ and output signal is $y(n)$ with intial values all 0. Replace \textbf{signal.filtfilt} with your own routine and verify
   \section{Solution}
-  Using the properties of z-transform
+  The function \textbf{signal.filtfilt(b,a,x)} filters the input using Butter worth filter .This function applies a digital filter twice, once forward and once backward. The combined filter has zero phase shift. 
+  Analytically, let $v(n)$ denote the output of the first filtering operation(forward) and let $h(n)$ be the impulse response of the filter. Then:
+  
+  \begin{equation}
+  \begin{aligned}
+    v\brak{n} = \brak{h*x}\brak{n} 
+  \end{aligned}
+  \end{equation}
+  
+
+ For the second filtering operation (backward), we ``flip'' $v(n)$ to obtain $v(-n)$ and apply the filter again:
+ \begin{align}
+    w\brak{n} = \brak{h*flip\brak{v}}\brak{n}
+ \end{align}
+
+ The final output is then the above result flipped:
+ \begin{align}
+    y = flip\brak{w} = flip\brak{h*flip\brak{v}} = flip\brak{h}*v 
+ \end{align}
+ 
+ \begin{align}
+ \label{eq:y_equation}
+    y\brak{n} = flip\brak{h*\brak{h*x}} = \brak{flip\brak{h}*\brak{h*x}}\brak{n}
+ \end{align}
+ Using the properties of z-transform
+ \begin{align}
+    {\mathcal {Z}}\{flip(x)\} = X(z^{-k}) 
+ \end{align}
+
+ Applying Z-transform to \eqref{eq:y_equation} gives:
+ \begin{align}
+     Y\brak{z} = H(x^{-1}\brak{H\brak{z}X\brak{z}} 
+ \end{align}
+ For real filters h, this reduces to
+ 
+ \begin{align}
+    Y\brak{exp\brak{jwT}} &=  |H\brak{exp\brak{jwT}}|^{2}\\
+                             &\qquad\ X\brak{exp\brak{jwT}}
+ \end{align}
+ Using the properties of z-transform
   \begin{align}
       {\mathcal {Z}}\{x(n-k)\} = z^{-k}X(z) \\
       {\mathcal {Z}}\{y(n-m)\} = z^{-m}Y(z)
   \end{align}
   where $X(z)$ and $Y(z)$ are the respective z-transforms of $x(n)$ and $y(n)$ respectively.
 \newline
+
 Converting the difference equation into its z-transform equation
 \begin{align}
      Y\brak{z} \sum _{m=0}^{M}a\brak{m} z^{-m} = X\brak{z} \sum _{k=0}^{N}b\brak{k}z^{-k}
@@ -166,14 +206,15 @@ Converting the difference equation into its z-transform equation
 \label{eq:Hz_equation}
     H\brak{z} = \frac{Y\brak{z}}{X\brak{z}} = \frac{\sum _{k=0}^{N}b\brak{k} z^{-k}}{\sum _{m=0}^{M}a\brak{m}z^{-m}}
 \end{align}    
-From the coefficients b,a and from \eqref{eq:Hz_equation} evaluating $H(K)$
+From the coefficients b,a and from \eqref{eq:Hz_equation} evaluating $H(K)$.
 \\
 Using built in fft command evaluating $X(K)$ from $x(n)$\\
 From 
 \begin{align}
     Y\brak{K} = H\brak{K}X\brak{K}
 \end{align}
-Using built in ifft command evaluating $y(n)$ from $Y(K)$
+Using built in ifft command evaluating $y(n)$ from $Y(K)$.
+\\
 \\
 Below is the following python code for the above question
 \begin{lstlisting}
@@ -184,18 +225,18 @@ Below is the soundfile constructed from output signal y using own routine filter
 codes/Sound_With_ReducedNoise_7.1.wav
 \end{lstlisting}
 \section{Verification}
-Plotting the time domain output signal evaluated from both own routine filter and signal.filtfilt command
-\begin{figure}[!h]
+Plotting the time domain output signal evaluated from both own routine filter and signal.filtfilt command and Plotting the frequency domain response evaluated from both own routine and signal.filtfilt.
+
+\begin{figure}[!ht]
 \centering
-\includegraphics[width=1.2\columnwidth]{../figs/ee18btech11033_1.eps}
+	\includegraphics[width=1.0\columnwidth]{./figs/ee18btech11033_1.eps}
 \caption{Time domain response}
 \label{fig:Figure1}
 \end{figure}
-\\
-Plotting the frequency domain response evaluated from both own routine and signal.filtfilt
-\begin{figure}[!h]
+
+\begin{figure}[!ht]
 \centering
-\includegraphics[width=1.2\columnwidth]{../figs/ee18btech11033_2.eps}
+\includegraphics[width=1.0\columnwidth]{./figs/ee18btech11033_2.eps}
 \caption{Frequency domain response}
 \label{fig:Figure2}
 \end{figure}
